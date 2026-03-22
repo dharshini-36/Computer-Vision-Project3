@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import streamlit as st
 from PIL import Image
-import os
 
 # ---------------------------
 # Helper Functions
@@ -71,51 +70,32 @@ def suggest_outfit(skin_tone, face_shape, occasion):
     return suggestions
 
 
-def show_outfit_images(occasion):
-    folder_path = f"outfits/{occasion.lower()}"
-
-    if os.path.exists(folder_path):
-        images = os.listdir(folder_path)
-
-        st.subheader(f"👗 {occasion} Outfit Ideas")
-        cols = st.columns(3)
-
-        for i, img in enumerate(images):
-            img_path = os.path.join(folder_path, img)
-            cols[i % 3].image(img_path, use_column_width=True)
-    else:
-        st.warning("No outfit images found!")
-
-
 # ---------------------------
 # Streamlit UI
 # ---------------------------
 
-st.set_page_config(page_title="AI Personal Stylist", layout="wide")
-
 st.title("👗 AI Personal Stylist")
-st.write("Get personalized outfit recommendations using AI 💡")
 
-# Input choice
+# 👉 Input choice
 option = st.radio("Choose Input Method", ["Upload Image", "Use Webcam"])
 
 image = None
 
-# Upload
+# 👉 Upload option
 if option == "Upload Image":
     uploaded_file = st.file_uploader("Upload your image", type=["jpg", "png", "jpeg"])
     if uploaded_file:
         image = Image.open(uploaded_file)
         image = np.array(image)
 
-# Webcam
+# 👉 Webcam option
 elif option == "Use Webcam":
     camera_image = st.camera_input("Capture your image")
     if camera_image:
         image = Image.open(camera_image)
         image = np.array(image)
 
-# Occasion
+# 👉 Occasion selection
 occasion = st.selectbox("Select Occasion", ["Casual", "Party", "Formal"])
 
 # ---------------------------
@@ -134,17 +114,12 @@ if image is not None:
             skin_tone = get_skin_tone(image, face)
             face_shape = get_face_shape(face)
 
-            st.success("Analysis completed successfully!")
-
             st.subheader("🧠 Analysis")
-            st.write(f"**Skin Tone:** {skin_tone}")
-            st.write(f"**Face Shape:** {face_shape}")
+            st.write(f"Skin Tone: {skin_tone}")
+            st.write(f"Face Shape: {face_shape}")
 
             suggestions = suggest_outfit(skin_tone, face_shape, occasion)
 
             st.subheader("✨ Style Suggestions")
             for s in suggestions:
                 st.write("✔️", s)
-
-            # 👉 Outfit Images
-            show_outfit_images(occasion)
