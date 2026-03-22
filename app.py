@@ -6,13 +6,23 @@ from PIL import Image
 # ---------------------------
 # Helper Functions
 # ---------------------------
-
 def detect_face(image):
+    # ✅ Convert RGB → BGR (IMPORTANT FIX)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
     face_cascade = cv2.CascadeClassifier(
         cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
     )
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+
+    faces = face_cascade.detectMultiScale(
+        gray,
+        scaleFactor=1.1,   # 🔥 more sensitive
+        minNeighbors=4,    # 🔥 detects more faces
+        minSize=(30, 30)
+    )
+
     return faces
 
 
